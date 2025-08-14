@@ -49,7 +49,7 @@
 // import  {OpenAI} from "openai";
 // const client = new OpenAI({
 //     // apiKey: "GEMINI_API_KEY",
-//     apiKey: "AIzaSyDqmTkO9SQmsP33tBaGBzV-LAwkoUu1tnI",
+//     apiKey: "Write your GEMINI_API_KEY",
 //     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
 // });
 
