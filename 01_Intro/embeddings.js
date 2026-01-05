@@ -1,3 +1,7 @@
+// Input Embeddings : Generate embeddings for a given input text using OpenAI's API.
+// It generates a high-dimensional vector representation of the input text that can be used for various NLP tasks such as semantic search, clustering, and classification.
+// sementic meaning is captured in the embeddings due to which similar texts have similar embeddings.
+
 import 'dotenv/config';
 import { OpenAI } from 'openai';
 
