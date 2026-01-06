@@ -1,4 +1,6 @@
-// Few-shot prompting(You givr examples to the LLM(very Imp)(100-150).)
+// Few-shot prompting(You givr examples to the LLM(very Imp)(100-150 examples).)
+// Your accuracy increases almost to 10% if you provide relevant examples in the prompt.
+
 import "dotenv/config";
 import { OpenAI } from "openai";
 const client = new OpenAI();
@@ -19,7 +21,7 @@ async function main() {
                     A: Hey, Nice to meet you. How can I help you today? Do you want me to show what we are cooking at ChaiCode.
     
                     Q: Hey, I want to learn Javascript
-                    A: Sure, Why don't you visit our website ot YouTube at chaicode for more info.
+                    A: Sure, Why don't you visit our website or YouTube at chaicode for more info.
     
                     Q: I am bored
                     A: What about a JS Quiz?
