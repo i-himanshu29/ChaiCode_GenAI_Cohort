@@ -1,15 +1,17 @@
 import 'dotenv/config';
 import { OpenAI } from 'openai';
 import axios from 'axios';
-
 import { exec } from 'child_process';
 
+// getWeatherDetailsByCity - to get current weather details of the city using wttr.in api
 async function getWeatherDetailsByCity(cityname = '') {
   const url = `https://wttr.in/${cityname.toLowerCase()}?format=%C+%t`;
   const { data } = await axios.get(url, { responseType: 'text' });
   return `The current weather of ${cityname} is ${data}`;
 }
 
+// exec - to run linux / unix commands and return the output
+// It takes command as string and returns the output of the command
 async function executeCommand(cmd = '') {
   return new Promise((res, rej) => {
     exec(cmd, (error, data) => {
@@ -22,6 +24,7 @@ async function executeCommand(cmd = '') {
   });
 }
 
+// getGithubUserInfoByUsername - to get public info about github user using github api
 async function getGithubUserInfoByUsername(username = '') {
   const url = `https://api.github.com/users/${username.toLowerCase()}`;
   const { data } = await axios.get(url);
@@ -39,6 +42,7 @@ async function getGithubUserInfoByUsername(username = '') {
   });
 }
 
+// Map of available tools
 const TOOL_MAP = {
   getWeatherDetailsByCity: getWeatherDetailsByCity,
   getGithubUserInfoByUsername: getGithubUserInfoByUsername,
@@ -47,8 +51,10 @@ const TOOL_MAP = {
 
 const client = new OpenAI();
 
+// Main function to run the agent loop
 async function main() {
   // These api calls are stateless (Chain Of Thought)
+  // So we need to maintain the state of the conversation
   const SYSTEM_PROMPT = `
     You are an AI assistant who works on START, THINK and OUTPUT format.
     For a given user query first think and breakdown the problem into sub problems.
@@ -87,6 +93,7 @@ async function main() {
     ASSISTANT: { "step": "OUTPUT", "content": "The weather in Patiala is 27 C with little cloud. Please make sure to carry an umbrella with you. ☔️" }
   `;
 
+  // Initial messages
   const messages = [
     {
       role: 'system',
@@ -100,30 +107,32 @@ async function main() {
     },
   ];
 
+  // Agent loop
   while (true) {
+    // Call the OpenAI chat completion API
     const response = await client.chat.completions.create({
       model: 'gpt-4.1-mini',
       messages: messages,
     });
-
+    // Parse the response
     const rawContent = response.choices[0].message.content;
     const parsedContent = JSON.parse(rawContent);
-
+    // Add the assistant response to messages
     messages.push({
       role: 'assistant',
       content: JSON.stringify(parsedContent),
     });
-
+    // Handle the response based on the step
     if (parsedContent.step === 'START') {
       console.log(`🔥`, parsedContent.content);
       continue;
     }
-
+    // Handle THINK step
     if (parsedContent.step === 'THINK') {
       console.log(`\t🧠`, parsedContent.content);
       continue;
     }
-
+    // Handle TOOL step
     if (parsedContent.step === 'TOOL') {
       const toolToCall = parsedContent.tool_name;
       if (!TOOL_MAP[toolToCall]) {
@@ -145,7 +154,7 @@ async function main() {
       });
       continue;
     }
-
+    // Handle OUTPUT step
     if (parsedContent.step === 'OUTPUT') {
       console.log(`🤖`, parsedContent.content);
       break;
